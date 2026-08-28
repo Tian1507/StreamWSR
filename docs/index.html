@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StreamBWE</title>
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="css/bulma.min.css">
+  <link rel="stylesheet" href="css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="css/bulma-slider.min.css">
+  <link rel="stylesheet" href="css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="js/fontawesome.all.min.js"></script>
+  <script src="js/bulma-carousel.min.js"></script>
+  <script src="js/bulma-slider.min.js"></script>
+  <script src="js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title has-text-centered">StreamBWE: A Streamable and Efficient Neural Model for Speech Bandwidth Extension in MDCT Spectral Domain</h1>
+            <div class="is-size-5 publication-authors has-text-centered">
+              <!-- Paper authors -->
+              
+              <span class="author-block">
+                <a>Yuan Tian</a>,</span>
+              <span class="author-block">
+                <a href="https://faculty.ustc.edu.cn/aiyang/zh_CN/index.htm" target="_blank">Yang Ai</a>,</span>
+              <span class="author-block">
+                <a>Hui-Peng Du</a>,</span>
+              <span class="author-block">
+                <a href="https://yxlu-0102.github.io/" target="_blank">Ye-Xin Lu</a>,</span>
+              <span class="author-block">
+                <a href="http://staff.ustc.edu.cn/~zhling" target="_blank">Zhen-Hua Ling</a></span>
+            </div>
+
+            <!-- <div class="is-size-5 publication-authors">
+              <span class="author-block">National Engineering Research Center of Speech and Language Information Processing <br> University of Science and Technology of China<br></span>
+            </div> -->
+
+
+            <!-- <div class="column has-text-centered">
+              <div class="publication-links">  -->
+                  <!--                   Code Link. -->
+                <!-- <span class="link-block">
+                  <a href="https://github.com/fliu215/UDSE_Code" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+                </span> -->
+                  <!--                   ArXiv Link -->
+                <!-- <span class="link-block">
+                  <a href="https://arxiv.org/abs/2510.09974" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper</span>
+                  </a>
+                </span>
+              </div>
+            </div> -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            This paper proposes StreamBWE, a streaming-capable neural model for speech bandwidth extension (BWE), formulated in the modified discrete cosine transform (MDCT) spectral domain. 
+            By adopting a fully causal architecture and modeling the compact, real-valued MDCT spectrum, the proposed StreamBWE supports low-latency streaming inference while using lightweight modules suitable for real-time, low-resource scenarios.
+            In particular, StreamBWE begins by deriving the narrowband MDCT spectrum from the input narrowband speech. 
+            A lightweight, fully causal-convolutional SnBeConvNeXt model, that is, a ConvNeXt backbone equipped with SnakeBeta periodic activations, is subsequently employed to estimate the wideband MDCT spectrum, which is finally converted to a waveform via inverse MDCT (IMDCT).
+            We train StreamBWE adversarially with a multi-resolution MDCT discriminator (MR-MDCTD) that judges MDCT spectra across time-frequency scales, and add a frequency-weighted MDCT spectral loss to emphasize high-frequency details.
+            Experimental results indicate that StreamBWE delivers comparable or superior quality and intelligibility on both 16 kHz and 48 kHz target sampling rates, with only 2.57 GFLOPs and under 2.5 ms latency, highlighting both computational efficiency and real-time capability.
+            In addition, cross-domain experiments and downstream applications further validate StreamBWE's robust generalization to other audio data and its practical deployability within streaming speech-coding pipelines.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+<br>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">I. 8 kHz to 16 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h3 class="title is-5">Sample 1</h3>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+      <td style="text-align: center;"><b>Narrowband</b></th>
+      <td style="text-align: center;"><b>Wideband</b></th>
+      <td style="text-align: center;"><b>UDM+</b></th>
+      <td style="text-align: center;"><b>FLowHigh</b></th>
+      <td style="text-align: center;"><b>NVSR</b></th>
+      <td style="text-align: center;"><b>AP-BWE</b></th>
+      <td style="text-align: center;"><b>mdctGAN</b></th>
+      <td style="text-align: center;"><b>StreamBWE</b></th>
+      <!-- <td style="text-align: center;"><b>MS-BWE (Four Stages)</b></th> -->
+    </tr>
+
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto16k/Narrowband/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/Wideband/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/UDM+/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/FLowHigh/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/NVSR/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/AP-BWE/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/mdctGAN/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/StreamBWE/p362_225.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Narrowband/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Wideband/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/UDM+/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/FLowHigh/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/NVSR/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/AP-BWE/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/mdctGAN/p362_225.wav" type="audio/wav"></audio></td>
+    <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/StreamBWE/p362_225.wav" type="audio/wav"></audio></td>
+    <!-- <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="samples/BWE_flexible/8kto48k/ms-bwe.wav" type="audio/wav"></audio></td> -->
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h3 class="title is-5">Sample 2</h3>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+      <td style="text-align: center;"><b>Narrowband</b></th>
+      <td style="text-align: center;"><b>Wideband</b></th>
+      <td style="text-align: center;"><b>UDM+</b></th>
+      <td style="text-align: center;"><b>FLowHigh</b></th>
+      <td style="text-align: center;"><b>NVSR</b></th>
+      <td style="text-align: center;"><b>AP-BWE</b></th>
+      <td style="text-align: center;"><b>mdctGAN</b></th>
+      <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto16k/Narrowband/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/Wideband/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/UDM+/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/FLowHigh/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/NVSR/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/AP-BWE/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/mdctGAN/p363_350.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto16k/StreamBWE/p363_350.png" width="200px" height="128px"></td>
+    </tr>
+  
+      <tr>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Narrowband/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Wideband/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/UDM+/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/FLowHigh/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/NVSR/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/AP-BWE/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/mdctGAN/p363_350.wav" type="audio/wav"></audio></td>
+        <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/StreamBWE/p363_350.wav" type="audio/wav"></audio></td>
+      </tr>
+    </table>
+    <br>
+    <table align = "center" style="text-align: center;">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-centered">
+            <h2 class="title is-5">Sample 3</h2>
+          </div>
+        </div>
+      </div>
+      <br>
+      <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+      <tr>
+        <!-- <td style="text-align: center; width: 100px;"></td> -->
+        <td><img src="../wavs/8kto16k/Narrowband/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/Wideband/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/UDM+/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/FLowHigh/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/NVSR/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/AP-BWE/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/mdctGAN/p374_420.png" width="200px" height="128px"></td>
+        <td><img src="../wavs/8kto16k/StreamBWE/p374_420.png" width="200px" height="128px"></td>
+      </tr>
+    
+        <tr>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Narrowband/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Wideband/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/UDM+/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/FLowHigh/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/NVSR/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/AP-BWE/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/mdctGAN/p374_420.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/StreamBWE/p374_420.wav" type="audio/wav"></audio></td>
+        </tr>
+      </table>
+      <br>
+      <table align = "center" style="text-align: center;">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-centered">
+              <h2 class="title is-5">Sample 4</h2>
+            </div>
+          </div>
+        </div>
+        <br>
+        <tr>
+          <td style="text-align: center;"><b>Narrowband</b></th>
+          <td style="text-align: center;"><b>Wideband</b></th>
+          <td style="text-align: center;"><b>UDM+</b></th>
+          <td style="text-align: center;"><b>FLowHigh</b></th>
+          <td style="text-align: center;"><b>NVSR</b></th>
+          <td style="text-align: center;"><b>AP-BWE</b></th>
+          <td style="text-align: center;"><b>mdctGAN</b></th>
+          <td style="text-align: center;"><b>StreamBWE</b></th>
+        </tr>
+        <tr>
+          <!-- <td style="text-align: center; width: 100px;"></td> -->
+          <td><img src="../wavs/8kto16k/Narrowband/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/Wideband/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/UDM+/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/FLowHigh/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/NVSR/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/AP-BWE/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/mdctGAN/s5_115.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/StreamBWE/s5_115.png" width="200px" height="128px"></td>
+        </tr>
+    
+        <tr>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Narrowband/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Wideband/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/UDM+/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/FLowHigh/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/NVSR/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/AP-BWE/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/mdctGAN/s5_115.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/StreamBWE/s5_115.wav" type="audio/wav"></audio></td>
+        </tr>
+  </table>
+  <br>
+      <table align = "center" style="text-align: center;">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-centered">
+              <h2 class="title is-5">Sample 5</h2>
+            </div>
+          </div>
+        </div>
+        <br>
+        <tr>
+          <td style="text-align: center;"><b>Narrowband</b></th>
+          <td style="text-align: center;"><b>Wideband</b></th>
+          <td style="text-align: center;"><b>UDM+</b></th>
+          <td style="text-align: center;"><b>FLowHigh</b></th>
+          <td style="text-align: center;"><b>NVSR</b></th>
+          <td style="text-align: center;"><b>AP-BWE</b></th>
+          <td style="text-align: center;"><b>mdctGAN</b></th>
+          <td style="text-align: center;"><b>StreamBWE</b></th>
+        </tr>
+        <tr>
+          <!-- <td style="text-align: center; width: 100px;"></td> -->
+          <td><img src="../wavs/8kto16k/Narrowband/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/Wideband/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/UDM+/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/FLowHigh/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/NVSR/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/AP-BWE/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/mdctGAN/s5_130.png" width="200px" height="128px"></td>
+          <td><img src="../wavs/8kto16k/StreamBWE/s5_130.png" width="200px" height="128px"></td>
+        </tr>
+    
+        <tr>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Narrowband/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/Wideband/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/UDM+/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/FLowHigh/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/NVSR/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/AP-BWE/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/mdctGAN/s5_130.wav" type="audio/wav"></audio></td>
+          <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto16k/StreamBWE/s5_130.wav" type="audio/wav"></audio></td>
+        </tr>
+  </table>
+</section>
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">II. 4 kHz to 16 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/4kto16k/Narrowband/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/Wideband/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/UDM+/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/FLowHigh/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/NVSR/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/AP-BWE/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/mdctGAN/p360_152.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/StreamBWE/p360_152.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Narrowband/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Wideband/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/UDM+/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/FLowHigh/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/NVSR/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/AP-BWE/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/mdctGAN/p360_152.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/StreamBWE/p360_152.wav" type="audio/wav"></audio></td>
+    </tr>
+
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+          <td style="text-align: center;"><b>Narrowband</b></th>
+          <td style="text-align: center;"><b>Wideband</b></th>
+          <td style="text-align: center;"><b>UDM+</b></th>
+          <td style="text-align: center;"><b>FLowHigh</b></th>
+          <td style="text-align: center;"><b>NVSR</b></th>
+          <td style="text-align: center;"><b>AP-BWE</b></th>
+          <td style="text-align: center;"><b>mdctGAN</b></th>
+          <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/4kto16k/Narrowband/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/Wideband/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/UDM+/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/FLowHigh/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/NVSR/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/AP-BWE/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/mdctGAN/p361_093.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/StreamBWE/p361_093.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Narrowband/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Wideband/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/UDM+/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/FLowHigh/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/NVSR/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/AP-BWE/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/mdctGAN/p361_093.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/StreamBWE/p361_093.wav" type="audio/wav"></audio></td>
+    </tr>
+
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/4kto16k/Narrowband/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/Wideband/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/UDM+/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/FLowHigh/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/NVSR/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/AP-BWE/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/mdctGAN/p361_148.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/StreamBWE/p361_148.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Narrowband/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Wideband/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/UDM+/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/FLowHigh/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/NVSR/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/AP-BWE/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/mdctGAN/p361_148.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/StreamBWE/p361_148.wav" type="audio/wav"></audio></td>
+    </tr>
+
+  </table>
+  <br>
+
+  <table align = "center" style="text-align: center;">
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/4kto16k/Narrowband/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/Wideband/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/UDM+/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/FLowHigh/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/NVSR/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/AP-BWE/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/mdctGAN/p362_216.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/StreamBWE/p362_216.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Narrowband/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Wideband/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/UDM+/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/FLowHigh/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/NVSR/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/AP-BWE/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/mdctGAN/p362_216.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/StreamBWE/p362_216.wav" type="audio/wav"></audio></td>
+    </tr>
+
+  </table>
+  <br>
+  </table>
+  <table align = "center" style="text-align: center;">
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/4kto16k/Narrowband/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/Wideband/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/UDM+/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/FLowHigh/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/NVSR/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/AP-BWE/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/mdctGAN/p374_283.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/4kto16k/StreamBWE/p374_283.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Narrowband/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/Wideband/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/UDM+/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/FLowHigh/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/NVSR/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/AP-BWE/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/mdctGAN/p374_283.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/4kto16k/StreamBWE/p374_283.wav" type="audio/wav"></audio></td>
+    </tr>
+
+  </table>
+</section>
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">III. 2 kHz to 16 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/2kto16k/Narrowband/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/Wideband/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/UDM+/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/FLowHigh/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/NVSR/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/AP-BWE/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/mdctGAN/p361_158.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/StreamBWE/p361_158.png" width="200px" height="128px"></td>
+    </tr>
+
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Narrowband/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Wideband/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/UDM+/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/FLowHigh/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/NVSR/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/AP-BWE/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/mdctGAN/p361_158.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/StreamBWE/p361_158.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/2kto16k/Narrowband/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/Wideband/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/UDM+/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/FLowHigh/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/NVSR/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/AP-BWE/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/mdctGAN/p363_209.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/StreamBWE/p363_209.png" width="200px" height="128px"></td>
+    </tr>
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Narrowband/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Wideband/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/UDM+/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/FLowHigh/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/NVSR/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/AP-BWE/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/mdctGAN/p363_209.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/StreamBWE/p363_209.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/2kto16k/Narrowband/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/Wideband/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/UDM+/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/FLowHigh/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/NVSR/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/AP-BWE/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/mdctGAN/p364_164.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/StreamBWE/p364_164.png" width="200px" height="128px"></td>
+    </tr>
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Narrowband/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Wideband/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/UDM+/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/FLowHigh/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/NVSR/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/AP-BWE/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/mdctGAN/p364_164.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/StreamBWE/p364_164.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr> 
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/2kto16k/Narrowband/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/Wideband/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/UDM+/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/FLowHigh/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/NVSR/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/AP-BWE/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/mdctGAN/p376_299.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/StreamBWE/p376_299.png" width="200px" height="128px"></td>
+    </tr>    
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Narrowband/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Wideband/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/UDM+/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/FLowHigh/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/NVSR/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/AP-BWE/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/mdctGAN/p376_299.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/StreamBWE/p376_299.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr> 
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/2kto16k/Narrowband/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/Wideband/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/UDM+/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/FLowHigh/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/NVSR/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/AP-BWE/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/mdctGAN/s5_334.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/2kto16k/StreamBWE/s5_334.png" width="200px" height="128px"></td>
+    </tr>    
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Narrowband/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/Wideband/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/UDM+/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/FLowHigh/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/NVSR/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/AP-BWE/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/mdctGAN/s5_334.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/2kto16k/StreamBWE/s5_334.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+</section>
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">IV. 24 kHz to 48 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/24kto48k/Narrowband/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/Wideband/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/UDM+/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/FLowHigh/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/NVSR/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/AP-BWE/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/mdctGAN/p361_259.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/StreamBWE/p361_259.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Narrowband/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Wideband/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/UDM+/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/FLowHigh/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/NVSR/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/AP-BWE/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/mdctGAN/p361_259.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/StreamBWE/p361_259.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/24kto48k/Narrowband/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/Wideband/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/UDM+/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/FLowHigh/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/NVSR/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/AP-BWE/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/mdctGAN/p362_075.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/StreamBWE/p362_075.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Narrowband/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Wideband/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/UDM+/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/FLowHigh/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/NVSR/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/AP-BWE/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/mdctGAN/p362_075.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/StreamBWE/p362_075.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/24kto48k/Narrowband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/Wideband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/UDM+/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/FLowHigh/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/NVSR/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/AP-BWE/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/mdctGAN/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/StreamBWE/p362_121.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Narrowband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Wideband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/UDM+/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/FLowHigh/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/NVSR/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/AP-BWE/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/mdctGAN/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/StreamBWE/p362_121.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>   
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/24kto48k/Narrowband/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/Wideband/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/UDM+/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/FLowHigh/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/NVSR/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/AP-BWE/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/mdctGAN/p362_225.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/StreamBWE/p362_225.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Narrowband/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Wideband/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/UDM+/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/FLowHigh/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/NVSR/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/AP-BWE/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/mdctGAN/p362_225.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/StreamBWE/p362_225.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>   
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/24kto48k/Narrowband/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/Wideband/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/UDM+/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/FLowHigh/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/NVSR/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/AP-BWE/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/mdctGAN/p362_345.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/24kto48k/StreamBWE/p362_345.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Narrowband/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/Wideband/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/UDM+/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/FLowHigh/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/NVSR/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/AP-BWE/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/mdctGAN/p362_345.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/24kto48k/StreamBWE/p362_345.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+</section>
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">V. 16 kHz to 48 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/16kto48k/Narrowband/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/Wideband/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/UDM+/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/FLowHigh/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/NVSR/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/AP-BWE/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/mdctGAN/p362_069.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/StreamBWE/p362_069.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Narrowband/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Wideband/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/UDM+/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/FLowHigh/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/NVSR/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/AP-BWE/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/mdctGAN/p362_069.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/StreamBWE/p362_069.wav" type="audio/wav"></audio></td>
+      </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/16kto48k/Narrowband/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/Wideband/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/UDM+/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/FLowHigh/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/NVSR/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/AP-BWE/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/mdctGAN/p362_112.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/StreamBWE/p362_112.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Narrowband/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Wideband/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/UDM+/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/FLowHigh/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/NVSR/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/AP-BWE/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/mdctGAN/p362_112.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/StreamBWE/p362_112.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/16kto48k/Narrowband/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/Wideband/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/UDM+/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/FLowHigh/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/NVSR/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/AP-BWE/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/mdctGAN/p362_115.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/StreamBWE/p362_115.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Narrowband/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Wideband/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/UDM+/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/FLowHigh/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/NVSR/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/AP-BWE/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/mdctGAN/p362_115.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/StreamBWE/p362_115.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>   
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/16kto48k/Narrowband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/Wideband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/UDM+/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/FLowHigh/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/NVSR/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/AP-BWE/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/mdctGAN/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/StreamBWE/p362_121.png" width="200px" height="128px"></td>
+    </tr>    
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Narrowband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Wideband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/UDM+/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/FLowHigh/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/NVSR/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/AP-BWE/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/mdctGAN/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/StreamBWE/p362_121.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>   
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/16kto48k/Narrowband/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/Wideband/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/UDM+/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/FLowHigh/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/NVSR/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/AP-BWE/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/mdctGAN/p363_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/16kto48k/StreamBWE/p363_131.png" width="200px" height="128px"></td>
+    </tr>    
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Narrowband/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/Wideband/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/UDM+/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/FLowHigh/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/NVSR/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/AP-BWE/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/mdctGAN/p363_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/16kto48k/StreamBWE/p363_131.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+</section>
+
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">VI. 12 kHz to 48 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/12kto48k/Narrowband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/Wideband/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/UDM+/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/FLowHigh/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/NVSR/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/AP-BWE/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/mdctGAN/p362_121.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/StreamBWE/p362_121.png" width="200px" height="128px"></td>
+    </tr> 
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Narrowband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Wideband/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/UDM+/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/FLowHigh/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/NVSR/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/AP-BWE/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/mdctGAN/p362_121.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/StreamBWE/p362_121.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/12kto48k/Narrowband/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/Wideband/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/UDM+/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/FLowHigh/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/NVSR/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/AP-BWE/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/mdctGAN/p362_129.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/StreamBWE/p362_129.png" width="200px" height="128px"></td>
+    </tr> 
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Narrowband/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Wideband/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/UDM+/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/FLowHigh/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/NVSR/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/AP-BWE/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/mdctGAN/p362_129.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/StreamBWE/p362_129.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/12kto48k/Narrowband/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/Wideband/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/UDM+/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/FLowHigh/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/NVSR/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/AP-BWE/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/mdctGAN/p362_175.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/StreamBWE/p362_175.png" width="200px" height="128px"></td>
+    </tr> 
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Narrowband/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Wideband/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/UDM+/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/FLowHigh/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/NVSR/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/AP-BWE/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/mdctGAN/p362_175.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/StreamBWE/p362_175.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>     
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/12kto48k/Narrowband/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/Wideband/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/UDM+/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/FLowHigh/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/NVSR/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/AP-BWE/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/mdctGAN/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/StreamBWE/p362_362.png" width="200px" height="128px"></td>
+    </tr> 
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Narrowband/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Wideband/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/UDM+/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/FLowHigh/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/NVSR/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/AP-BWE/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/mdctGAN/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/StreamBWE/p362_362.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>  
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/12kto48k/Narrowband/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/Wideband/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/UDM+/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/FLowHigh/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/NVSR/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/AP-BWE/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/mdctGAN/s5_131.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/12kto48k/StreamBWE/s5_131.png" width="200px" height="128px"></td>
+    </tr>    
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Narrowband/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/Wideband/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/UDM+/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/FLowHigh/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/NVSR/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/AP-BWE/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/mdctGAN/s5_131.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/12kto48k/StreamBWE/s5_131.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+</section>
+
+<hr>
+<section class="hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-centered">
+        <h2 class="title is-3">VII. 8 kHz to 48 kHz</h2>
+      </div>
+    </div>
+  </div>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 1</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto48k/Narrowband/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/Wideband/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/UDM+/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/FLowHigh/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/NVSR/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/AP-BWE/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/mdctGAN/p361_318.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/StreamBWE/p361_318.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Narrowband/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Wideband/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/UDM+/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/FLowHigh/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/NVSR/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/AP-BWE/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/mdctGAN/p361_318.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/StreamBWE/p361_318.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 2</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto48k/Narrowband/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/Wideband/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/UDM+/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/FLowHigh/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/NVSR/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/AP-BWE/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/mdctGAN/p362_100.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/StreamBWE/p362_100.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Narrowband/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Wideband/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/UDM+/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/FLowHigh/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/NVSR/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/AP-BWE/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/mdctGAN/p362_100.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/StreamBWE/p362_100.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 3</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto48k/Narrowband/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/Wideband/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/UDM+/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/FLowHigh/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/NVSR/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/AP-BWE/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/mdctGAN/p362_117.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/StreamBWE/p362_117.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Narrowband/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Wideband/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/UDM+/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/FLowHigh/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/NVSR/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/AP-BWE/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/mdctGAN/p362_117.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/StreamBWE/p362_117.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 4</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr> 
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto48k/Narrowband/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/Wideband/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/UDM+/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/FLowHigh/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/NVSR/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/AP-BWE/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/mdctGAN/p362_362.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/StreamBWE/p362_362.png" width="200px" height="128px"></td>
+    </tr>      
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Narrowband/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Wideband/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/UDM+/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/FLowHigh/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/NVSR/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/AP-BWE/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/mdctGAN/p362_362.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/StreamBWE/p362_362.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+  <br>
+  <table align = "center" style="text-align: center;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-centered">
+          <h2 class="title is-5">Sample 5</h2>
+        </div>
+      </div>
+    </div>
+    <br>
+    <tr>
+        <td style="text-align: center;"><b>Narrowband</b></th>
+        <td style="text-align: center;"><b>Wideband</b></th>
+        <td style="text-align: center;"><b>UDM+</b></th>
+        <td style="text-align: center;"><b>FLowHigh</b></th>
+        <td style="text-align: center;"><b>NVSR</b></th>
+        <td style="text-align: center;"><b>AP-BWE</b></th>
+        <td style="text-align: center;"><b>mdctGAN</b></th>
+        <td style="text-align: center;"><b>StreamBWE</b></th>
+    </tr>     
+    <tr>
+      <!-- <td style="text-align: center; width: 100px;"></td> -->
+      <td><img src="../wavs/8kto48k/Narrowband/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/Wideband/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/UDM+/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/FLowHigh/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/NVSR/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/AP-BWE/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/mdctGAN/p362_399.png" width="200px" height="128px"></td>
+      <td><img src="../wavs/8kto48k/StreamBWE/p362_399.png" width="200px" height="128px"></td>
+    </tr>  
+    <tr>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Narrowband/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/Wideband/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/UDM+/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/FLowHigh/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/NVSR/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/AP-BWE/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/mdctGAN/p362_399.wav" type="audio/wav"></audio></td>
+      <td><audio controls="" style='display: inline-block; width: 200px; height: 50px;'><source src="../wavs/8kto48k/StreamBWE/p362_399.wav" type="audio/wav"></audio></td>
+    </tr>
+  </table>
+</section>
+
+<!-- Statcounter tracking code -->
+  
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>
