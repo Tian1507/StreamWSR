@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StreamWSR</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <!-- Bulma + Icons (CDN, 不需要你再放本地文件) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Your styles -->
+  <link rel="stylesheet" href="css/index.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">
+              StreamWSR: Streamable and Lightweight Waveform-Domain Neural Speech Super-Resolution
+            </h1>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><a>Anonymous to ISCSLP</a></span>
+              <!-- <span class="author-block"><a href="https://faculty.ustc.edu.cn/aiyang/zh_CN/index.htm" target="_blank" rel="noreferrer">Yang Ai</a>,</span>
+              <span class="author-block"><a>Hui-Peng Du</a>,</span>
+              <span class="author-block"><a href="https://yxlu-0102.github.io/" target="_blank" rel="noreferrer">Ye-Xin Lu</a>,</span>
+              <span class="author-block"><a href="http://staff.ustc.edu.cn/~zhling" target="_blank" rel="noreferrer">Zhen-Hua Ling</a></span> -->
+            </div>
+
+            <!-- 你要加 Code/Paper 按钮，取消注释并换链接即可 -->
+            <!--
+            <div class="buttons is-centered mt-4">
+              <a class="button is-dark is-rounded" href="YOUR_GITHUB" target="_blank" rel="noreferrer">
+                <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+              </a>
+              <a class="button is-dark is-rounded" href="YOUR_ARXIV" target="_blank" rel="noreferrer">
+                <span class="icon"><i class="ai ai-arxiv"></i></span><span>Paper</span>
+              </a>
+            </div>
+            -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p id="abstract">
+              This paper proposes StreamWSR, a Streamable neural Waveform-domain model for speech Super-Resolution (SR).
+              By adopting a fully causal architecture with compact frame-level waveform representation, the proposed StreamWSR supports zero-look-ahead streaming inference while avoiding vocoder-based reconstruction and explicit phase prediction.
+              Specifically, StreamWSR downsamples the input waveform into a compact frame-level representation using strided causal convolutions.
+              Then, a lightweight causal long-short-term modeling backbone is employed to capture both local waveform structures and long-range historical dependencies under causal constraints.
+              Finally, the modeled output is converted back to the waveform domain through a causal transposed-convolutional decoder and combined with the input waveform via a residual connection to generate the final high-resolution speech.
+              Experimental results on 16 kHz speech SR show that StreamWSR achieves competitive or superior speech quality and intelligibility compared with representative waveform- and spectrum-based baselines, while maintaining a zero-look-ahead streaming advantage with only 9M parameters and 2G FLOPs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Samples (auto-rendered) -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="content">
+        <div class="sample-toolbar">
+          <div class="field">
+            <label class="label">Quick Jump</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select id="jumpSelect"></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Layout</label>
+            <div class="control">
+              <div class="buttons">
+                <button class="button is-small" id="btnDense">Dense</button>
+                <button class="button is-small" id="btnComfort">Comfort</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="samplesRoot"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p class="is-size-7">
+        © StreamBWE Demo Page. Static site generated by <code>js/data.js</code>.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Data + Renderer -->
+  <script src="js/data.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
